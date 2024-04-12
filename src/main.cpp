@@ -501,7 +501,12 @@ void setup()
         char payload[sensorCapacity];
         serializeJson(sensorJson, payload);
         Serial.printf("- Sensor payload: %s\n", payload);
-        if (client.publish(sensorTopic.c_str(), payload, MQTT_RETAIN))
+         
+        // Long Messages need different publish "style", based on https://github.com/knolleary/pubsubclient/blob/master/examples/mqtt_large_message/mqtt_large_message.ino
+        // if (client.publish(sensorTopic.c_str(), payload, MQTT_RETAIN))
+        client.beginPublish(sensorTopic.c_str(), strlen(payload), MQTT_RETAIN);
+        client.print(payload);
+        if (client.endPublish())
         {
           Serial.printf("-- Publishing --> %s\n", sensorTopic.c_str());
         }
